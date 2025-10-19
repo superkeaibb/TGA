@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Dynamic Gaussian Splatting for Avatars reconstructs meshes and renders scenes from multi-view video data.">
+  <meta name="keywords" content="Avatar, Gaussian Splatting, Dynamic Reconstruction">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TGA: True-to-Geometry Avatar Dynamic Reconstruction</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
+      <rect width='100%' height='100%' fill='white'/>
+      <text x='50%' y='50%' font-size='40' text-anchor='middle' dominant-baseline='central' fill='black'>TGA</text>
+    </svg>
+  ">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="https://baidu.com">
+      <span class="icon">
+          <i class="fas fa-home"></i>
+      </span>
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          More Research
+        </a>
+        <div class="navbar-dropdown">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">TGA: True-to-Geometry Avatar Dynamic Reconstruction</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              Bo Guo</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://wensijia.work">Sijia Wen</a><sup>1 &dagger; </sup>,</span>
+            <span class="author-block">
+              Ziwei Wang</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://zhao1f.github.io/">Yifan Zhao</a><sup>2</sup>,
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Beijing Advanced Innovation Center for Future Blockchain and Privacy Computing, <br> School of Artificial Intelligence, Beihang University</span>
+            <span class="author-block"><sup>2</sup>State Key Laboratory of Virtual Reality Technology and Systems, SCSE&QRI, Beihang University</span>
+          </div>
+
+          <div class="is-size-6">
+            <span>(<sup>†</sup>Corresponding author)</span>
+          </div>
+<br>
+          <div class="is-size-5 has-text-weight-bold">
+            NeurIPS 2025 Spotlight
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://keaibb.github.io/TGA/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://keaibb.github.io/TGA/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming Soon)</span>
+                  </a>
+              </span>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+        <img id="teaser" src="./static/images/teaser.png" alt="teaser" style="height:100%; object-fit:cover;">
+
+      <h2 class="subtitle">
+        Example results of our <i>TGA</i>. Our method generates (a) high-fidelity, frame-by-frame textured meshes from multi-view videos, (b) captures avatar-specific details across wide viewing angles, and (c) delivers realistic cross-reenactment performance.
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-steve">
+          <video poster="" id="steve" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/104.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-chair-tp">
+          <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/140.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-shiba">
+          <video poster="" id="shiba" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/210.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-fullbody">
+          <video poster="" id="fullbody" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/218.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-blueshirt">
+          <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/302.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-mask">
+          <video poster="" id="mask" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/304.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-coffee">
+          <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/306.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-toby">
+          <video poster="" id="toby" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/mesh/460.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+              Recent advances in 3D Gaussian Splatting (3DGS) have improved the visual fidelity
+            of dynamic avatar reconstruction. However, existing methods often overlook the inherent
+            chromatic similarity of human skin tones, leading to poor capture of intricate facial
+            geometry under subtle appearance changes. This is caused by the affine approximation
+            of Gaussian projection, which fails to be perspective-aware to depth-induced shear
+            effects. To this end, we propose <i>True-to-Geometry Avatar Dynamic Reconstruction (TGA)</i>,
+            a perspective-aware 4D Gaussian avatar framework that sensitively captures fine-grained
+            facial variations for accurate 3D geometry reconstruction. Specifically, to enable
+            color-sensitive and geometry-consistent Gaussian representations under dynamic conditions,
+            we introduce Perspective-Aware Gaussian Transformation that jointly models temporal
+            deformations and spatial projection by integrating Jacobian-guided adaptive deformation
+            into the homogeneous formulation. Furthermore, we develop Incremental BVH Tree Pivoting
+            to enable fast frame-by-frame mesh extraction for 4D Gaussian representations. A dynamic
+            Gaussian Bounding Volume Hierarchy (BVH) tree is used to model the topological
+            relationships among points, where active ones are filtered out by BVH pivoting and
+            subsequently re-triangulated for surface reconstruction. Extensive experiments demonstrate
+            that TGA achieves superior geometric accuracy.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+    <!-- Paper video. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Video</h2>
+        <div class="publication-video">
+          <iframe src=""
+                  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+    <!--/ Paper video. -->
+  </div>
+
+
+    <!-- Paper Pipeline. -->
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <h2 class="title is-3">Method</h2>
+      <img class="img-responsive" src="./static/images/pipeline.png" alt="Pipeline">
+      <div class="content has-text-justified">
+      <span class="Pipeline">Given multi-view RGB sequences, we first track facial dynamics with
+        FLAME (a). During the Perspective-aware Transformation (b), we apply Jacobian-guided
+        deformation and homogeneous projection for accurate geometric modeling. After
+        (c), we build and dynamically update a Gaussian BVH (d), where BVH pivoting adaptively
+        filters hopping points, enabling geo-accurate surface extraction via Marching Tetrahedra
+        (rightmost column).</span></div>
+    </div>
+  </div>
+      <!-- /Paper Pipeline. -->
+</section>
+
+
+
+
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <!-- Animation. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Results</h2>
+
+        <!-- NVS. -->
+        <h3 class="title is-4">Novel view synthesis</h3>
+        <div class="content has-text-justified">
+          <!--
+          <p>
+            We can also animate the scene by interpolating the deformation latent codes of two input
+            frames. Use the slider here to linearly interpolate between the left frame and the right
+            frame.
+          </p>
+          -->
+        </div>
+
+        <!-- 可放到全局 CSS，这里内联方便直接用 -->
+        <style>
+          .results-carousel video {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+          }
+        </style>
+
+        <div class="hero-body">
+          <div class="container">
+            <div id="results-carousel-nvs" class="carousel results-carousel">
+              <div class="item item-104">
+                <video id="104-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/104.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-165">
+                <video id="165-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/165.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-175">
+                <video id="175-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/175.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-218">
+                <video id="218-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/218.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-304">
+                <video id="304-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/304.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-306">
+                <video id="306-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/306.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-210">
+                <video id="210-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/210.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-460">
+                <video id="460-nvs" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/nvs/460.mp4" type="video/mp4">
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--/ NVS. -->
+
+        <br>
+
+        <!-- Self. -->
+        <h3 class="title is-4">Self-reenactment</h3>
+        <div class="content has-text-justified">
+          <!-- 可添加说明 -->
+        </div>
+
+        <div class="hero-body">
+          <div class="container">
+            <div id="results-carousel-self" class="carousel results-carousel">
+              <div class="item item-304">
+                <video id="304-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/304.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-306">
+                <video id="306-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/306.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-210">
+                <video id="210-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/210.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-460">
+                <video id="460-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/460.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-104">
+                <video id="104-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/104.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-165">
+                <video id="165-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/165.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-175">
+                <video id="175-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/175.mp4" type="video/mp4">
+                </video>
+              </div>
+              <div class="item item-218">
+                <video id="218-self" autoplay muted loop playsinline controls>
+                  <source src="./static/videos/self/218.mp4" type="video/mp4">
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--/ Self. -->
+
+      </div>
+    </div>
+    <!--/ Animation. -->
+
+    <!-- Concurrent Work. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Related Links</h2>
+
+        <div class="content has-text-justified">
+          <p>There's a lot of excellent work that was introduced around the same time as ours.</p>
+          <p>
+            <a href="https://shenhanqian.github.io/gaussian-avatars">GaussianAvatars</a>
+            pioneeringly rigs Gaussian point clouds to a parametric morphable face model.
+          </p>
+          <p>
+            <a href="https://xuanchenli.github.io/Topo4D/">Topo4D</a>
+            builds temporally consistent 4D topology and high-fidelity textures for dynamic scene reconstruction across frames.
+          </p>
+          <p>
+            <a href="https://summertight.github.io/SurFhead/">SurFhead</a>
+            reconstructs geometrically accurate avatars using 2D Gaussian surfels.
+          </p>
+          <p>
+            We kindly recommend checking out <a href="https://niujinshuchong.github.io/gaussian-opacity-fields/">Gaussian Opacity Fields</a>,
+            which leverages ray-tracing-based volume rendering of 3D Gaussians to directly extract geometry via level-set identification and adaptive Marching Tetrahedra.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Concurrent Work. -->
+
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>?</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link"
+         href="https://github.com/keaibb">
+        <i class="fas fa-file-pdf"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/keaibb" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            We borrow the website <a
+              href="https://github.com/nerfies/nerfies.github.io">template</a> from this,
+            many thanks for their great help!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
